@@ -4,37 +4,20 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from api.serializers import UserSerializer
 
+from api.ai.ai_controller import generate_ai_data
+from api.utils import update_user
 
 @api_view(['POST'])
 def home(request):
     try :
-        data = {
-            "username" : "yanis",
-            "age" : "young adult",
-            "gender" : "male",
-            "activity" : "high",
-            "height" : "180",
-            "weight" : "70",
-            "goal" : "bulk",
-            "schedule" : "busy"
-        }
+        data = request.data
 
-        result = {
-            "health" : "good",
-            "food" : "increase",
-            "training" : "high (5 a week)",
-            "program" : "arnold split",
-            "eat" : ["meat","eggs","fish","vegetables","fruits"],
-            "avoid" : ["nothing"],
-            "nutients" : {
-                "calories" : "5000",
-                "protien" : "200g",
-                "carbs" : "500g",
-                "fibres" : "50g",
-                "fat" : "60"
-            },
-            "advice" : ["Eat in a surplus","Lift heavy weights consistently","Get enough rest and recovery"]
-        }
+        #get result
+        result = generate_ai_data(data)
+
+        #update result to user
+        update_user(data['username'], result)
+
     except Exception as e:
         print(e)
         return Response({'status' : 'fail','message' : 'ERROR !'},status=status.HTTP_400_BAD_REQUEST)
